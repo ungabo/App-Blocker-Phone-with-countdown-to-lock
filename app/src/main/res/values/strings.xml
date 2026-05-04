@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Focus Blocker</string>
+    <string name="accessibility_service_description">Detects when a blocked app opens and checks browser address bars for blocked domains during active focus sessions. It does not read messages, passwords, or typed text for monitoring.</string>
+    <string name="widget_description">Quick-start focus blocking sessions.</string>
+</resources>

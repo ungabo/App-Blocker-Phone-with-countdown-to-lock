@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F6F0"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Focus Countdown"
+        android:textColor="#18201B"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:minHeight="38dp"
+        android:text="Set: -  In: -  For: -"
+        android:textColor="#304B3D"
+        android:textSize="11sp" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3">
+
+        <Button
+            android:id="@+id/widget_set_a"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Set A"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_set_b"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Set B"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_set_c"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Set C"
+            android:textSize="10sp" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="5">
+
+        <Button
+            android:id="@+id/widget_delay_0"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Now"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_delay_5"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="In 5"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_delay_10"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="In 10"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_delay_20"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="In 20"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_delay_30"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="In 30"
+            android:textSize="10sp" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="5">
+
+        <Button
+            android:id="@+id/widget_duration_5"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="5m"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_duration_15"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="15m"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_duration_30"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="30m"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_duration_60"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="60m"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_duration_90"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="90m"
+            android:textSize="10sp" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3">
+
+        <Button
+            android:id="@+id/widget_start"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Start"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_refresh"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Refresh"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/widget_clear_countdowns"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_columnWeight="1"
+            android:text="Clear"
+            android:textSize="10sp" />
+    </GridLayout>
+</LinearLayout>
