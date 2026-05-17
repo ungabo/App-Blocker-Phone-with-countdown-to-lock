@@ -20,7 +20,11 @@ class AppContainer(application: Application) {
         AppDatabase::class.java,
         "focus-blocker.db"
     )
-        .addMigrations(AppDatabase.MIGRATION_1_2)
+        .addMigrations(
+            AppDatabase.MIGRATION_1_2,
+            AppDatabase.MIGRATION_2_3,
+            AppDatabase.MIGRATION_3_4
+        )
         .build()
 
     val settingsRepository = SettingsRepository(application)
@@ -32,5 +36,5 @@ class AppContainer(application: Application) {
     val scheduledLockRepository = ScheduledLockRepository(application, database.scheduledLockDao())
     private val emergencyAllowlist = EmergencyAllowlist(application, settingsRepository)
     private val ruleEngine = RuleEngine()
-    val blockingRepository = BlockingRepository(database, emergencyAllowlist, ruleEngine)
+    val blockingRepository = BlockingRepository(application, database, emergencyAllowlist, ruleEngine)
 }

@@ -12,6 +12,7 @@ data class RuleSetEntity(
     val createdAt: Long,
     val updatedAt: Long,
     val sortOrder: Int = 0,
-    val isSystemPreset: Boolean = false
+    val isSystemPreset: Boolean = false,
+    val showInWidget: Boolean = true,
+    val lastUsedAt: Long? = null
 )
-

@@ -40,6 +40,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -229,7 +231,8 @@ fun FocusBlockerApp(viewModel: FocusBlockerViewModel) {
                     },
                     onDuplicateRuleSet = viewModel::duplicateRuleSet,
                     onDeleteRuleSet = viewModel::deleteRuleSet,
-                    onStartRuleSet = { viewModel.startRuleSet(it, SessionSource.APP) }
+                    onStartRuleSet = { viewModel.startRuleSet(it, SessionSource.APP) },
+                    onSetWidgetStarred = viewModel::setWidgetStarred
                 )
             }
 
@@ -261,6 +264,7 @@ fun FocusBlockerApp(viewModel: FocusBlockerViewModel) {
                     onNameChanged = viewModel::updateDraftName,
                     onModeChanged = viewModel::updateDraftMode,
                     onDefaultDurationChanged = viewModel::updateDraftDefaultDuration,
+                    onShowInWidgetChanged = viewModel::updateDraftShowInWidget,
                     onAddDomain = viewModel::addDraftDomain,
                     onRemoveDomain = viewModel::removeDraftDomain,
                     onOpenApps = {
@@ -535,8 +539,11 @@ private fun RuleSetsScreen(
     onEditRuleSet: (Long) -> Unit,
     onDuplicateRuleSet: (Long) -> Unit,
     onDeleteRuleSet: (Long) -> Unit,
-    onStartRuleSet: (Long) -> Unit
+    onStartRuleSet: (Long) -> Unit,
+    onSetWidgetStarred: (Long, Boolean) -> Unit
 ) {
+    val starredCount = ruleSets.count { it.showInWidget }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -548,6 +555,12 @@ private fun RuleSetsScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Add Rule Set")
             }
+            Text(
+                "$starredCount/3 widget sets starred",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         items(ruleSets, key = { it.id }) { ruleSet ->
@@ -570,9 +583,32 @@ private fun RuleSetsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
+                        IconButton(
+                            onClick = { onSetWidgetStarred(ruleSet.id, !ruleSet.showInWidget) }
+                        ) {
+                            Icon(
+                                imageVector = if (ruleSet.showInWidget) {
+                                    Icons.Filled.Star
+                                } else {
+                                    Icons.Filled.StarBorder
+                                },
+                                contentDescription = if (ruleSet.showInWidget) {
+                                    "Remove widget star"
+                                } else {
+                                    "Star for widget"
+                                }
+                            )
+                        }
                         AssistChip(onClick = {}, label = {
                             Text("${ruleSet.appCount} apps - ${ruleSet.domainCount} domains")
                         })
+                    }
+                    if (ruleSet.showInWidget) {
+                        Text(
+                            "Starred for widget",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -607,6 +643,7 @@ private fun RuleSetEditorScreen(
     onNameChanged: (String) -> Unit,
     onModeChanged: (RuleMode) -> Unit,
     onDefaultDurationChanged: (String) -> Unit,
+    onShowInWidgetChanged: (Boolean) -> Unit,
     onAddDomain: (String) -> Unit,
     onRemoveDomain: (String) -> Unit,
     onOpenApps: () -> Unit,
@@ -662,6 +699,21 @@ private fun RuleSetEditorScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Star for widget")
+                        Text(
+                            "Up to 3 starred sets appear as widget Run buttons.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Switch(checked = draft.showInWidget, onCheckedChange = onShowInWidgetChanged)
+                }
             }
         }
 
@@ -671,6 +723,11 @@ private fun RuleSetEditorScreen(
                 Text(
                     "${draft.selectedPackages.size} selected apps will be ${if (draft.mode == RuleMode.ALLOW_ONLY) "allowed" else "blocked"}.",
                     style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "System apps are ignored by blocking rules and stay allowed for safety.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedButton(onClick = onOpenApps, modifier = Modifier.fillMaxWidth()) {
                     Text("Choose Apps")
@@ -778,7 +835,7 @@ private fun InstalledAppsScreen(
             ) {
                 Text("${selectedPackages.size} apps selected")
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Include system apps")
+                    Text("Show system apps")
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
                         checked = includeSystemApps,
@@ -786,6 +843,11 @@ private fun InstalledAppsScreen(
                     )
                 }
             }
+            Text(
+                "System apps are always allowed by the blocker, even in allow-only mode.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         LazyColumn(
@@ -794,7 +856,11 @@ private fun InstalledAppsScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
             items(filteredApps, key = { it.packageName }) { app ->
-                ElevatedCard(onClick = { onTogglePackage(app.packageName) }) {
+                val isSelected = app.packageName in selectedPackages
+                val canToggle = !app.isSystemApp || isSelected
+                ElevatedCard(onClick = {
+                    if (canToggle) onTogglePackage(app.packageName)
+                }) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -822,10 +888,20 @@ private fun InstalledAppsScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            if (app.isSystemApp) {
+                                Text(
+                                    "System app - always allowed",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                         Checkbox(
-                            checked = app.packageName in selectedPackages,
-                            onCheckedChange = { onTogglePackage(app.packageName) }
+                            checked = isSelected,
+                            onCheckedChange = {
+                                if (canToggle) onTogglePackage(app.packageName)
+                            },
+                            enabled = canToggle
                         )
                     }
                 }

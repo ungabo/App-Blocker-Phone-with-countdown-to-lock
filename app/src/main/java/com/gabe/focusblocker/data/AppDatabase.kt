@@ -24,7 +24,7 @@ import com.gabe.focusblocker.data.entity.ScheduledLockEntity
         ActiveSessionEntity::class,
         ScheduledLockEntity::class
     ],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -53,6 +53,18 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     """.trimIndent()
                 )
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE rule_sets ADD COLUMN showInWidget INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE rule_sets ADD COLUMN lastUsedAt INTEGER")
             }
         }
     }

@@ -29,6 +29,19 @@ interface RuleSetDao {
     @Query("SELECT * FROM rule_sets ORDER BY sortOrder ASC, updatedAt DESC")
     suspend fun getAllOrdered(): List<RuleSetEntity>
 
+    @Query("SELECT * FROM rule_sets WHERE showInWidget = 1 ORDER BY sortOrder ASC, updatedAt DESC LIMIT :limit")
+    suspend fun getWidgetRuleSets(limit: Int): List<RuleSetEntity>
+
+    @Query(
+        """
+        SELECT * FROM rule_sets
+        WHERE showInWidget = 1 AND id != :excludeId
+        ORDER BY COALESCE(lastUsedAt, 0) ASC, sortOrder ASC, updatedAt ASC
+        LIMIT :limit
+        """
+    )
+    suspend fun getLeastRecentlyUsedWidgetRuleSets(excludeId: Long, limit: Int): List<RuleSetEntity>
+
     @Query("SELECT * FROM rule_sets WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): RuleSetEntity?
 
@@ -43,6 +56,12 @@ interface RuleSetDao {
 
     @Update
     suspend fun update(ruleSet: RuleSetEntity)
+
+    @Query("UPDATE rule_sets SET showInWidget = :showInWidget, updatedAt = :now WHERE id = :id")
+    suspend fun setShowInWidget(id: Long, showInWidget: Boolean, now: Long)
+
+    @Query("UPDATE rule_sets SET lastUsedAt = :now WHERE id = :id")
+    suspend fun markUsed(id: Long, now: Long)
 
     @Delete
     suspend fun delete(ruleSet: RuleSetEntity)

@@ -5,58 +5,143 @@
     android:layout_height="match_parent"
     android:background="#F8F6F0"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="8dp">
 
     <TextView
-        android:id="@+id/widget_title"
+        android:id="@+id/widget_run_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Focus Countdown"
+        android:gravity="center"
+        android:text="Run"
         android:textColor="#18201B"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/widget_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:minHeight="38dp"
-        android:text="Set: -  In: -  For: -"
-        android:textColor="#304B3D"
-        android:textSize="11sp" />
-
     <GridLayout
+        android:id="@+id/widget_set_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="3">
 
-        <Button
-            android:id="@+id/widget_set_a"
+        <LinearLayout
+            android:id="@+id/widget_set_column_0"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="Set A"
-            android:textSize="10sp" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/widget_set_b"
-            android:layout_width="0dp"
-            android:layout_height="34dp"
-            android:layout_columnWeight="1"
-            android:text="Set B"
-            android:textSize="10sp" />
+            <Button
+                android:id="@+id/widget_set_0"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:text="Set 1"
+                android:textSize="9sp" />
 
-        <Button
-            android:id="@+id/widget_set_c"
+            <TextView
+                android:id="@+id/widget_set_status_0_0"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/widget_set_status_0_1"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_set_column_1"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text="Set C"
-            android:textSize="10sp" />
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/widget_set_1"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:text="Set 2"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/widget_set_status_1_0"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/widget_set_status_1_1"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_set_column_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/widget_set_2"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:text="Set 3"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/widget_set_status_2_0"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/widget_set_status_2_1"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text=" "
+                android:textColor="#304B3D"
+                android:textSize="9sp" />
+        </LinearLayout>
     </GridLayout>
 
+    <TextView
+        android:id="@+id/widget_in_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:text="In"
+        android:textColor="#18201B"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
     <GridLayout
+        android:id="@+id/widget_delay_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="5">
@@ -64,45 +149,57 @@
         <Button
             android:id="@+id/widget_delay_0"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="Now"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_delay_5"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
-            android:text="In 5"
-            android:textSize="10sp" />
+            android:text="5m"
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_delay_10"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
-            android:text="In 10"
-            android:textSize="10sp" />
+            android:text="10m"
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_delay_20"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
-            android:text="In 20"
-            android:textSize="10sp" />
+            android:text="20m"
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_delay_30"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
-            android:text="In 30"
-            android:textSize="10sp" />
+            android:text="30m"
+            android:textSize="9sp" />
     </GridLayout>
 
+    <TextView
+        android:id="@+id/widget_for_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:text="For"
+        android:textColor="#18201B"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
     <GridLayout
+        android:id="@+id/widget_duration_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="5">
@@ -110,71 +207,71 @@
         <Button
             android:id="@+id/widget_duration_5"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="5m"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_duration_15"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="15m"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_duration_30"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="30m"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_duration_60"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="60m"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_duration_90"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="90m"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
     </GridLayout>
 
+    <Button
+        android:id="@+id/widget_start"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:text="Start"
+        android:textSize="9sp" />
+
     <GridLayout
+        android:id="@+id/widget_action_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="3">
-
-        <Button
-            android:id="@+id/widget_start"
-            android:layout_width="0dp"
-            android:layout_height="34dp"
-            android:layout_columnWeight="1"
-            android:text="Start"
-            android:textSize="10sp" />
+        android:columnCount="2">
 
         <Button
             android:id="@+id/widget_refresh"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="Refresh"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
 
         <Button
             android:id="@+id/widget_clear_countdowns"
             android:layout_width="0dp"
-            android:layout_height="34dp"
+            android:layout_height="32dp"
             android:layout_columnWeight="1"
             android:text="Clear"
-            android:textSize="10sp" />
+            android:textSize="9sp" />
     </GridLayout>
 </LinearLayout>

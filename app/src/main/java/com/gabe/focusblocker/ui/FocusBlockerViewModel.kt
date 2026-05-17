@@ -34,7 +34,8 @@ data class RuleSetCardUi(
     val defaultDurationLabel: String,
     val appCount: Int,
     val domainCount: Int,
-    val isSystemPreset: Boolean
+    val isSystemPreset: Boolean,
+    val showInWidget: Boolean
 )
 
 data class ActiveSessionUi(
@@ -64,6 +65,7 @@ data class RuleSetEditorDraft(
     val name: String = "",
     val mode: RuleMode = RuleMode.BLOCK_LIST,
     val defaultDurationMinutesText: String = "",
+    val showInWidget: Boolean = true,
     val selectedPackages: Set<String> = emptySet(),
     val domains: List<String> = emptyList()
 )
@@ -95,7 +97,8 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
                         defaultDurationLabel = TimeUtils.minutesToLabel(it.ruleSet.defaultDurationMinutes),
                         appCount = it.appCount,
                         domainCount = it.domainCount,
-                        isSystemPreset = it.ruleSet.isSystemPreset
+                        isSystemPreset = it.ruleSet.isSystemPreset,
+                        showInWidget = it.ruleSet.showInWidget
                     )
                 }
             }
@@ -194,6 +197,10 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
         _editorDraft.value = _editorDraft.value?.copy(defaultDurationMinutesText = text)
     }
 
+    fun updateDraftShowInWidget(show: Boolean) {
+        _editorDraft.value = _editorDraft.value?.copy(showInWidget = show)
+    }
+
     fun toggleDraftPackage(packageName: String) {
         val draft = _editorDraft.value ?: return
         val updated = draft.selectedPackages.toMutableSet().apply {
@@ -225,8 +232,10 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
                 defaultDurationMinutes = draft.defaultDurationMinutesText.toIntOrNull(),
                 selectedPackages = draft.selectedPackages,
                 domains = draft.domains,
-                isSystemPreset = draft.isSystemPreset
+                isSystemPreset = draft.isSystemPreset,
+                showInWidget = draft.showInWidget
             )
+            FocusWidgetProvider.requestUpdate(getApplication())
             clearEditor()
             onSaved()
         }
@@ -236,6 +245,7 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             val ruleSet = ruleSetRepository.getRuleSetById(ruleSetId) ?: return@launch
             sessionRepository.startSession(ruleSet = ruleSet, source = source)
+            ruleSetRepository.markRuleSetUsed(ruleSet.id)
             refreshExternalStatus()
         }
     }
@@ -249,6 +259,7 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
                 durationMinutes = durationMinutes,
                 source = source
             )
+            ruleSetRepository.markRuleSetUsed(ruleSet.id)
             refreshExternalStatus()
         }
     }
@@ -256,12 +267,21 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
     fun duplicateRuleSet(ruleSetId: Long) {
         viewModelScope.launch {
             ruleSetRepository.duplicateRuleSet(ruleSetId)
+            FocusWidgetProvider.requestUpdate(getApplication())
         }
     }
 
     fun deleteRuleSet(ruleSetId: Long) {
         viewModelScope.launch {
             ruleSetRepository.deleteRuleSet(ruleSetId)
+            refreshExternalStatus()
+        }
+    }
+
+    fun setWidgetStarred(ruleSetId: Long, starred: Boolean) {
+        viewModelScope.launch {
+            ruleSetRepository.setWidgetStarred(ruleSetId, starred)
+            FocusWidgetProvider.requestUpdate(getApplication())
         }
     }
 
@@ -345,6 +365,7 @@ class FocusBlockerViewModel(application: Application) : AndroidViewModel(applica
             name = ruleSet.name,
             mode = ruleSet.mode,
             defaultDurationMinutesText = ruleSet.defaultDurationMinutes?.toString().orEmpty(),
+            showInWidget = ruleSet.showInWidget,
             selectedPackages = selectedPackages,
             domains = domains
         )

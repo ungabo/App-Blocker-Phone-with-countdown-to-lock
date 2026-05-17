@@ -21,6 +21,7 @@ class ScheduledLockWorker(
                     source = lock.source,
                     durationMinutesOverride = lock.durationMinutes
                 )
+                app.container.ruleSetRepository.markRuleSetUsed(ruleSet.id, now)
             }
             app.container.database.scheduledLockDao().markCompleted(lock.id, now)
         }

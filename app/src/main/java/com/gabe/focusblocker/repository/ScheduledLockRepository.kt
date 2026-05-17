@@ -11,6 +11,7 @@ import com.gabe.focusblocker.data.entity.RuleSetEntity
 import com.gabe.focusblocker.data.entity.ScheduledLockEntity
 import com.gabe.focusblocker.data.entity.SessionSource
 import com.gabe.focusblocker.data.model.ScheduledLockWithRuleSet
+import com.gabe.focusblocker.widget.RecentWidgetPresets
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
 
@@ -41,6 +42,7 @@ class ScheduledLockRepository(
             )
         )
         enqueueStartWorker(id, startsAt)
+        RecentWidgetPresets.record(context, ruleSet, delayMinutes, durationMinutes)
         return id
     }
 

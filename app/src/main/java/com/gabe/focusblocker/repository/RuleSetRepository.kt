@@ -41,6 +41,10 @@ class RuleSetRepository(private val database: AppDatabase) {
 
     suspend fun getRuleSetById(ruleSetId: Long): RuleSetEntity? = ruleSetDao.getById(ruleSetId)
 
+    suspend fun markRuleSetUsed(ruleSetId: Long, now: Long = System.currentTimeMillis()) {
+        ruleSetDao.markUsed(ruleSetId, now)
+    }
+
     suspend fun seedDefaultsIfEmpty(now: Long) {
         if (ruleSetDao.count() > 0) return
 
@@ -84,9 +88,11 @@ class RuleSetRepository(private val database: AppDatabase) {
         defaultDurationMinutes: Int?,
         selectedPackages: Set<String>,
         domains: List<String>,
-        isSystemPreset: Boolean = false
+        isSystemPreset: Boolean = false,
+        showInWidget: Boolean = true
     ): Long = database.withTransaction {
         val now = System.currentTimeMillis()
+        val shouldShowInWidget = existingId == null || showInWidget
         val ruleSetId = if (existingId == null) {
             val sortOrder = ruleSetDao.count()
             ruleSetDao.insert(
@@ -97,7 +103,8 @@ class RuleSetRepository(private val database: AppDatabase) {
                     createdAt = now,
                     updatedAt = now,
                     sortOrder = sortOrder,
-                    isSystemPreset = isSystemPreset
+                    isSystemPreset = isSystemPreset,
+                    showInWidget = shouldShowInWidget
                 )
             )
         } else {
@@ -108,10 +115,15 @@ class RuleSetRepository(private val database: AppDatabase) {
                     name = name,
                     mode = mode,
                     defaultDurationMinutes = defaultDurationMinutes,
-                    updatedAt = now
+                    updatedAt = now,
+                    showInWidget = shouldShowInWidget
                 )
             )
             existingId
+        }
+
+        if (shouldShowInWidget) {
+            enforceWidgetStarLimit(protectedRuleSetId = ruleSetId, now = now)
         }
 
         ruleAppDao.deleteForRuleSet(ruleSetId)
@@ -139,6 +151,14 @@ class RuleSetRepository(private val database: AppDatabase) {
         ruleSetId
     }
 
+    suspend fun setWidgetStarred(ruleSetId: Long, starred: Boolean) = database.withTransaction {
+        val now = System.currentTimeMillis()
+        ruleSetDao.setShowInWidget(ruleSetId, starred, now)
+        if (starred) {
+            enforceWidgetStarLimit(protectedRuleSetId = ruleSetId, now = now)
+        }
+    }
+
     suspend fun duplicateRuleSet(ruleSetId: Long) {
         val detail = observeRuleSetDetailOnce(ruleSetId) ?: return
         saveRuleSet(
@@ -147,7 +167,8 @@ class RuleSetRepository(private val database: AppDatabase) {
             mode = detail.ruleSet.mode,
             defaultDurationMinutes = detail.ruleSet.defaultDurationMinutes,
             selectedPackages = detail.selectedPackages,
-            domains = detail.domains
+            domains = detail.domains,
+            showInWidget = detail.ruleSet.showInWidget
         )
     }
 
@@ -164,5 +185,25 @@ class RuleSetRepository(private val database: AppDatabase) {
         val apps = ruleAppDao.getForRuleSet(ruleSetId).map { it.packageName }.toSet()
         val domains = ruleDomainDao.getForRuleSet(ruleSetId).map { it.domain }
         return RuleSetDetail(ruleSet = ruleSet, selectedPackages = apps, domains = domains)
+    }
+
+    private suspend fun enforceWidgetStarLimit(protectedRuleSetId: Long, now: Long) {
+        val starred = ruleSetDao.getWidgetRuleSets(Int.MAX_VALUE)
+        val overflowCount = starred.size - MAX_WIDGET_RULE_SETS
+        if (overflowCount <= 0) return
+
+        starred
+            .filterNot { it.id == protectedRuleSetId }
+            .sortedWith(
+                compareBy<RuleSetEntity> { it.lastUsedAt ?: 0L }
+                    .thenBy { it.sortOrder }
+                    .thenBy { it.updatedAt }
+            )
+            .take(overflowCount)
+            .forEach { ruleSetDao.setShowInWidget(it.id, false, now) }
+    }
+
+    companion object {
+        const val MAX_WIDGET_RULE_SETS = 3
     }
 }

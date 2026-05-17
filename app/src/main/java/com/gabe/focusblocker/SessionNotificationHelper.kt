@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.gabe.focusblocker.util.TimeUtils
 
 object SessionNotificationHelper {
-    private const val CHANNEL_ID = "active_focus_sessions"
+    private const val CHANNEL_ID = "active_focus_sessions_silent"
     private const val NOTIFICATION_ID = 1001
 
     suspend fun refresh(context: Context) {
@@ -82,7 +82,12 @@ object SessionNotificationHelper {
             .setStyle(NotificationCompat.BigTextStyle().bigText(content))
             .setContentIntent(openIntent)
             .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
+            .setDefaults(0)
+            .setSound(null)
+            .setVibrate(LongArray(0))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .apply {
                 if (chronometerTarget != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     setWhen(chronometerTarget)
@@ -104,8 +109,12 @@ object SessionNotificationHelper {
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Active focus sessions",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            setSound(null, null)
+            enableVibration(false)
+            setShowBadge(false)
+        }
         manager.createNotificationChannel(channel)
     }
 }

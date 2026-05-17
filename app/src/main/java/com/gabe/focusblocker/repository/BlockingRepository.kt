@@ -1,11 +1,14 @@
 package com.gabe.focusblocker.repository
 
+import android.content.Context
 import com.gabe.focusblocker.data.AppDatabase
 import com.gabe.focusblocker.engine.BlockingDecision
 import com.gabe.focusblocker.engine.EmergencyAllowlist
 import com.gabe.focusblocker.engine.RuleEngine
+import com.gabe.focusblocker.util.PackageUtils
 
 class BlockingRepository(
+    private val context: Context,
     private val database: AppDatabase,
     private val emergencyAllowlist: EmergencyAllowlist,
     private val ruleEngine: RuleEngine
@@ -17,6 +20,10 @@ class BlockingRepository(
     suspend fun evaluatePackage(packageName: String): BlockingDecision {
         val now = System.currentTimeMillis()
         cleanupExpiredSessions(now)
+
+        if (PackageUtils.isSystemPackage(context, packageName)) {
+            return BlockingDecision(blocked = false)
+        }
 
         val activeSessions = database.activeSessionDao().getEnabledSessions()
             .filter { it.expiresAt == null || it.expiresAt > now }
