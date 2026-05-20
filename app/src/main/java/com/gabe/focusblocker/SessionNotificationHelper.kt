@@ -14,6 +14,7 @@ import com.gabe.focusblocker.util.TimeUtils
 
 object SessionNotificationHelper {
     private const val CHANNEL_ID = "active_focus_sessions_silent"
+    private const val LEGACY_CHANNEL_ID = "active_focus_sessions"
     private const val NOTIFICATION_ID = 1001
 
     suspend fun refresh(context: Context) {
@@ -26,6 +27,8 @@ object SessionNotificationHelper {
         val scheduledLocks = app.container.database.scheduledLockDao()
             .getEnabledOpenLocksWithRuleSet()
             .filter { it.scheduledLock.startsAt > now }
+        val manager = context.getSystemService(NotificationManager::class.java)
+        ensureChannel(manager)
 
         if (sessions.isEmpty() && scheduledLocks.isEmpty()) {
             cancel(context)
@@ -39,9 +42,6 @@ object SessionNotificationHelper {
         ) {
             return
         }
-
-        val manager = context.getSystemService(NotificationManager::class.java)
-        ensureChannel(manager)
 
         val activeContent = sessions.joinToString(separator = "\n") {
             "Ends ${it.ruleSetName}: ${TimeUtils.formatRemainingTime(it.session.expiresAt?.minus(now))}"
@@ -106,6 +106,7 @@ object SessionNotificationHelper {
 
     private fun ensureChannel(manager: NotificationManager) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        manager.deleteNotificationChannel(LEGACY_CHANNEL_ID)
         val channel = NotificationChannel(
             CHANNEL_ID,
             "Active focus sessions",

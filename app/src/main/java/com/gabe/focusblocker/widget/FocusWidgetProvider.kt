@@ -40,10 +40,6 @@ class FocusWidgetProvider : AppWidgetProvider() {
     companion object {
         const val MAX_WIDGET_SETS = 3
 
-        private const val COLOR_BLUE = 0xFF1565C0.toInt()
-        private const val COLOR_GREEN = 0xFF2E7D32.toInt()
-        private const val COLOR_LIGHT_GREEN = 0xFFC8E6C9.toInt()
-        private const val COLOR_YELLOW = 0xFFFFC107.toInt()
         private const val COLOR_WHITE = 0xFFFFFFFF.toInt()
         private const val COLOR_DARK = 0xFF18201B.toInt()
 
@@ -168,6 +164,7 @@ class FocusWidgetProvider : AppWidgetProvider() {
                     setViewVisibility(setColumnIds[index], View.INVISIBLE)
                     setTextViewText(viewId, "")
                     setBoolean(viewId, "setEnabled", false)
+                    applyButtonStyle(viewId, R.drawable.widget_button_default, COLOR_DARK)
                     setStatusLines(index, emptyList())
                     return@forEachIndexed
                 }
@@ -176,6 +173,7 @@ class FocusWidgetProvider : AppWidgetProvider() {
                 setBoolean(viewId, "setEnabled", true)
                 setTextViewText(viewId, ruleSet.name.shortWidgetName(14))
                 setOnClickPendingIntent(viewId, ruleSetIntent(context, ruleSet.id, index))
+                applyButtonStyle(viewId, R.drawable.widget_button_default, COLOR_DARK)
                 applySelectionColor(
                     viewId = viewId,
                     selected = ruleSet.id == state.selectedSetId,
@@ -198,6 +196,7 @@ class FocusWidgetProvider : AppWidgetProvider() {
                     viewId,
                     actionIntent(context, WidgetActionReceiver.ACTION_SELECT_DELAY, minutes)
                 )
+                applyButtonStyle(viewId, R.drawable.widget_button_default, COLOR_DARK)
                 applySelectionColor(
                     viewId = viewId,
                     selected = minutes == state.selectedDelay,
@@ -213,6 +212,7 @@ class FocusWidgetProvider : AppWidgetProvider() {
                     viewId,
                     actionIntent(context, WidgetActionReceiver.ACTION_SELECT_DURATION, minutes)
                 )
+                applyButtonStyle(viewId, R.drawable.widget_button_default, COLOR_DARK)
                 applySelectionColor(
                     viewId = viewId,
                     selected = minutes == state.selectedDuration,
@@ -227,10 +227,19 @@ class FocusWidgetProvider : AppWidgetProvider() {
                 R.id.widget_start,
                 actionIntent(context, WidgetActionReceiver.ACTION_START_SELECTED, 0)
             )
+            applyButtonStyle(R.id.widget_start, R.drawable.widget_button_default, COLOR_DARK)
             when {
-                state.feedbackActive -> setButtonColor(R.id.widget_start, COLOR_LIGHT_GREEN, COLOR_DARK)
-                state.isComplete -> setButtonColor(R.id.widget_start, COLOR_BLUE, COLOR_WHITE)
-                state.hasAnySelection -> setButtonColor(R.id.widget_start, COLOR_YELLOW, COLOR_DARK)
+                state.feedbackActive -> applyButtonStyle(
+                    R.id.widget_start,
+                    R.drawable.widget_button_light_green,
+                    COLOR_DARK
+                )
+                state.isComplete -> applyButtonStyle(R.id.widget_start, R.drawable.widget_button_blue, COLOR_WHITE)
+                state.hasAnySelection -> applyButtonStyle(
+                    R.id.widget_start,
+                    R.drawable.widget_button_yellow,
+                    COLOR_DARK
+                )
             }
         }
 
@@ -239,10 +248,12 @@ class FocusWidgetProvider : AppWidgetProvider() {
                 R.id.widget_refresh,
                 actionIntent(context, WidgetActionReceiver.ACTION_REFRESH, 0)
             )
+            applyButtonStyle(R.id.widget_refresh, R.drawable.widget_button_default, COLOR_DARK)
             setOnClickPendingIntent(
                 R.id.widget_clear_countdowns,
                 actionIntent(context, WidgetActionReceiver.ACTION_CLEAR_COUNTDOWNS, 0)
             )
+            applyButtonStyle(R.id.widget_clear_countdowns, R.drawable.widget_button_default, COLOR_DARK)
         }
 
         private fun RemoteViews.bindRootOpenIntent(context: Context) {
@@ -264,11 +275,11 @@ class FocusWidgetProvider : AppWidgetProvider() {
         ) {
             if (!selected) return
             if (state.feedbackActive) {
-                setButtonColor(viewId, COLOR_LIGHT_GREEN, COLOR_DARK)
+                applyButtonStyle(viewId, R.drawable.widget_button_light_green, COLOR_DARK)
             } else if (state.isComplete) {
-                setButtonColor(viewId, COLOR_GREEN, COLOR_WHITE)
+                applyButtonStyle(viewId, R.drawable.widget_button_green, COLOR_WHITE)
             } else {
-                setButtonColor(viewId, COLOR_BLUE, COLOR_WHITE)
+                applyButtonStyle(viewId, R.drawable.widget_button_blue, COLOR_WHITE)
             }
         }
 
@@ -278,12 +289,12 @@ class FocusWidgetProvider : AppWidgetProvider() {
                 durationButtons.map { it.first } +
                 listOf(R.id.widget_start, R.id.widget_refresh, R.id.widget_clear_countdowns)
             allButtonIds.forEach { viewId ->
-                setButtonColor(viewId, COLOR_LIGHT_GREEN, COLOR_DARK)
+                applyButtonStyle(viewId, R.drawable.widget_button_light_green, COLOR_DARK)
             }
         }
 
-        private fun RemoteViews.setButtonColor(viewId: Int, backgroundColor: Int, textColor: Int) {
-            setInt(viewId, "setBackgroundColor", backgroundColor)
+        private fun RemoteViews.applyButtonStyle(viewId: Int, backgroundRes: Int, textColor: Int) {
+            setInt(viewId, "setBackgroundResource", backgroundRes)
             setTextColor(viewId, textColor)
         }
 
